@@ -67,9 +67,7 @@ app.post('/api/contact', contactLimiter, async (req, res) => {
   }
 });
 
-// 2. FALLBACK ROUTE: Express v5 compatible global wildcard catch-all
-app.get('/:path*', (req, res) => {
+/// 2. FALLBACK ROUTE: Express v5 explicit catch-all parameter format
+app.get('*all', (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
 });
-
-app.listen(PORT, () => console.log(`⚡ Unified App Running on Port ${PORT}`));
