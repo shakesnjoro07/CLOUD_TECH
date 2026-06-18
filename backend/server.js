@@ -23,16 +23,19 @@ app.use(express.static(path.join(__dirname, '../frontend/dist')));
 
 // Nodemailer transport engine setup
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host: 'smtp.gmail.com',
+  port: 465,
+  secure: true, // Use SSL
   auth: { 
     user: process.env.EMAIL_USER, 
     pass: process.env.EMAIL_PASS 
   },
-  connectionTimeout: 10000, // 10 seconds max connection wait time
+  connectionTimeout: 10000, 
   greetingTimeout: 10000,
-  socketTimeout: 10000
+  socketTimeout: 10000,
+  // 🌟 THIS LINE IS THE FIX: Forces Node to ignore IPv6 addresses
+  connectionOptions: { family: 4 } 
 });
-
 const additionalServices = [
   { id: 1, title: 'Web Development', desc: 'High-performance, stunning, responsive websites tailored to your brand.' },
   { id: 2, title: 'AI & Bot Creation', desc: 'Custom automation, Discord/Telegram bots, and intelligent workflows.' },
