@@ -1,5 +1,6 @@
 // frontend/src/components/Contact.jsx
 import React, { useState, useEffect } from 'react';
+import emailjs from '@emailjs/browser'; // Ensure you ran: npm install @emailjs/browser
 
 // Accept selectedProject and setSelectedProject as props from App.jsx
 export default function Contact({ selectedProject, setSelectedProject }) {
@@ -41,11 +42,10 @@ export default function Contact({ selectedProject, setSelectedProject }) {
     }
   };
 
-  // 1. Secure Nodemailer Backend Submit Protocol
+  // 1. Direct EmailJS Submit Protocol (Bypasses Backend Connection Errors)
   const handleEmailSubmit = async (e) => {
     e.preventDefault();
 
-    // FIXED: Corrected the broken "f" statement back to "if"
     if (formData.phone.length < 10) {
       setStatus({ success: false, message: 'Please provide a valid 10-digit phone number.' });
       return;
@@ -54,36 +54,40 @@ export default function Contact({ selectedProject, setSelectedProject }) {
     setLoading(true); 
     setStatus({ success: null, message: '' });
 
+    // Map form fields to match your EmailJS Template variables exactly
+    const templateParams = {
+      from_name: formData.name,
+      from_email: formData.email,
+      phone_number: formData.phone,
+      location: formData.location,
+      project_type: formData.projectType,
+      message: formData.message,
+    };
+
     try {
-      const response = await fetch('/api/contact', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
+      // REPLACE THESE THREE STRINGS WITH YOUR EMAILJS CREDENTIALS
+      await emailjs.send(
+        'service_fdz9l8s',   // e.g., 'service_abcdef'
+        'template_52an1ze',  // e.g., 'template_ghijk'
+        templateParams,
+        '5gEQ-VzEfh9dkSr_V'    // e.g., 'user_lmnopq...'
+      );
+
+      setStatus({ 
+        success: true, 
+        message: 'Inquiry sent to Cloud Technologies successfully! Our work is efficient, fast, and high-quality. We will carefully analyze your project specifications and send a detailed design brief straight to your email. Thank you for choosing us!' 
       });
-
-      const data = await response.json();
-
-      if (data.success) {
-        setStatus({ 
-          success: true, 
-          message: 'Inquiry sent to Cloud Technologies successfully! Our work is efficient, fast, and high-quality. We will carefully analyze your project specifications and send a detailed design brief straight to your email. Thank you for choosing us!' 
-        });
-        
-        // Reset local form and clear parent selection state
-        setFormData({ name: '', email: '', phone: '', location: '', projectType: 'Web Development', message: '' });
-        if (setSelectedProject) setSelectedProject('');
-        
-        setTimeout(() => {
-          setStatus({ success: null, message: '' });
-        }, 20000);
-      } else {
-        setStatus({ success: false, message: data.message || 'Routing failure.' });
-      }
+      
+      // Reset local form and clear parent selection state
+      setFormData({ name: '', email: '', phone: '', location: '', projectType: 'Web Development', message: '' });
+      if (setSelectedProject) setSelectedProject('');
+      
+      setTimeout(() => {
+        setStatus({ success: null, message: '' });
+      }, 20000);
     } catch (err) {
-      console.error('Backend Communication Error:', err);
-      setStatus({ success: false, message: 'Network transit exception. Secure mail gateway offline.' });
+      console.error('EmailJS Communication Error:', err);
+      setStatus({ success: false, message: 'EmailJS gateway transit error. Secure mail gateway offline.' });
     } finally {
       setLoading(false);
     }
@@ -197,7 +201,6 @@ export default function Contact({ selectedProject, setSelectedProject }) {
             </button>
           </div>
 
-          {/* Success / Error Feedbacks */}
           {status.message && (
             <div className={`p-4 rounded-xl text-sm border ${status.success ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' : 'bg-rose-500/10 border-rose-500/30 text-rose-400'}`}>
               {status.message}
