@@ -18,13 +18,16 @@ app.use(express.json());
 // 1. Serve the compiled static frontend files from the Vite build
 app.use(express.static(path.join(__dirname, '../frontend/dist')));
 
-// Nodemailer transport engine setup (Optimized for Production Gmail)
+// Nodemailer transport engine setup
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: { 
     user: process.env.EMAIL_USER, 
     pass: process.env.EMAIL_PASS 
-  }
+  },
+  connectionTimeout: 10000, // 10 seconds max connection wait time
+  greetingTimeout: 10000,
+  socketTimeout: 10000
 });
 const additionalServices = [
   { id: 1, title: 'Web Development', desc: 'High-performance, stunning, responsive websites tailored to your brand.' },

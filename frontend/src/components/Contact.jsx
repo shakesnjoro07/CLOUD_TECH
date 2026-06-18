@@ -45,16 +45,16 @@ export default function Contact({ selectedProject, setSelectedProject }) {
   const handleEmailSubmit = async (e) => {
     e.preventDefault();
 
+    // FIXED: Corrected the broken "f" statement back to "if"
     if (formData.phone.length < 10) {
       setStatus({ success: false, message: 'Please provide a valid 10-digit phone number.' });
       return;
     }
 
-    setLoading(true);
+    setLoading(true); 
     setStatus({ success: null, message: '' });
 
     try {
-      // FIXED: Swapped out 'http://localhost:5000/api/contact' for a relative routing endpoint
       const response = await fetch('/api/contact', {
         method: 'POST',
         headers: {
