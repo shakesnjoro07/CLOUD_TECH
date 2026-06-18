@@ -10,7 +10,8 @@ function App() {
   const [selectedProject, setSelectedProject] = useState('');
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/services')
+    // FIXED: Swapped 'http://localhost:5000/api/services' for a relative environment routing pathway
+    fetch('/api/services')
       .then(res => res.json())
       .then(data => setServices(data))
       .catch(err => console.error("Error fetching services:", err));
