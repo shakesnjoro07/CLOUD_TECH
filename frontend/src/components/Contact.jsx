@@ -50,11 +50,12 @@ export default function Contact({ selectedProject, setSelectedProject }) {
       return;
     }
 
-    setLoading(true);
+    loading(true);
     setStatus({ success: null, message: '' });
 
     try {
-      const response = await fetch('http://localhost:5000/api/contact', {
+      // FIXED: Swapped out 'http://localhost:5000/api/contact' for a relative routing endpoint
+      const response = await fetch('/api/contact', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
