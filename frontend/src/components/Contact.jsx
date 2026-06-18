@@ -50,7 +50,7 @@ export default function Contact({ selectedProject, setSelectedProject }) {
       return;
     }
 
-    loading(true);
+    setLoading(true);
     setStatus({ success: null, message: '' });
 
     try {
