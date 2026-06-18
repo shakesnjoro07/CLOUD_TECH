@@ -67,7 +67,14 @@ app.post('/api/contact', contactLimiter, async (req, res) => {
   }
 });
 
-/// 2. FALLBACK ROUTE: Express v5 explicit catch-all parameter format
-app.get('*all', (req, res) => {
+// 2. FALLBACK ROUTE: Foolproof Express v5 static catch-all middleware
+// This completely avoids strict URL parsing issues from path-to-regexp
+app.use((req, res, next) => {
+  if (req.url.startsWith('/api')) {
+    return res.status(404).json({ success: false, message: 'API route not found' });
+  }
   res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
 });
+
+// Start listening for traffic
+app.listen(PORT, () => console.log(`⚡ Unified App Running on Port ${PORT}`));
