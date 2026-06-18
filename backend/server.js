@@ -6,7 +6,7 @@ const express = require('express');
 const cors = require('cors');
 const nodemailer = require('nodemailer');
 const rateLimit = require('express-rate-limit');
-const path = require('path'); // Added for handling file paths
+const path = require('path'); 
 require('dotenv').config();
 
 const app = express();
@@ -16,7 +16,6 @@ app.use(cors());
 app.use(express.json());
 
 // 1. Serve the compiled static frontend files from the Vite build
-// This tells Express where your React code lives
 app.use(express.static(path.join(__dirname, '../frontend/dist')));
 
 // Nodemailer transport engine setup
@@ -68,8 +67,8 @@ app.post('/api/contact', contactLimiter, async (req, res) => {
   }
 });
 
-// 2. FALLBACK ROUTE: Redirects any non-API web request to your React Frontend
-app.get('*', (req, res) => {
+// 2. FALLBACK ROUTE: Express v5 compatible global wildcard catch-all
+app.get('/:path*', (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
 });
 
