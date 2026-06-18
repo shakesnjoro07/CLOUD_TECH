@@ -12,6 +12,9 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// FIXED: Tell Express to trust the Render proxy so express-rate-limit doesn't throw a validation error
+app.set('trust proxy', 1);
+
 app.use(cors());
 app.use(express.json());
 
@@ -29,6 +32,7 @@ const transporter = nodemailer.createTransport({
   greetingTimeout: 10000,
   socketTimeout: 10000
 });
+
 const additionalServices = [
   { id: 1, title: 'Web Development', desc: 'High-performance, stunning, responsive websites tailored to your brand.' },
   { id: 2, title: 'AI & Bot Creation', desc: 'Custom automation, Discord/Telegram bots, and intelligent workflows.' },
@@ -65,12 +69,13 @@ app.post('/api/contact', contactLimiter, async (req, res) => {
     await transporter.sendMail(mailOptions);
     res.json({ success: true, message: 'Inquiry processed successfully!' });
   } catch (error) {
+    // Log the actual error to your Render dashboard just in case auth fails later
+    console.error('Email Send Error:', error);
     res.status(500).json({ success: false, message: 'Server processing error.' });
   }
 });
 
 // 2. FALLBACK ROUTE: Foolproof Express v5 static catch-all middleware
-// This completely avoids strict URL parsing issues from path-to-regexp
 app.use((req, res, next) => {
   if (req.url.startsWith('/api')) {
     return res.status(404).json({ success: false, message: 'API route not found' });
